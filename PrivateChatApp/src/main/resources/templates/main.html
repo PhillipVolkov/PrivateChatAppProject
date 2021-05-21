@@ -11,5 +11,30 @@
     
     <body>
     	<div><h1 th:text="${'Hello! ' + test}"></h1></div>
+    	
+    	
+    	<div>
+	    	<h3>Users</h3>
+	    	
+	    	<div class="break"></div>
+	    	
+	       	<table>
+	           <thead>
+	           	<tr>
+	                <th>ID</th>
+	                <th>Name</th>
+	                <th>Password</th>
+	            </tr>
+	           </thead>
+	           
+	           <tbody>
+	            <tr th:each="user : ${users}">
+	                <td th:text="${user.getId()}"></td>
+	                <td th:text="${user.getUsername()}"></td>
+	                <td th:text="${user.getPassword()}"></td>
+	            </tr>
+	           </tbody>
+	        </table>
+    	</div>
     </body>
 </html>

@@ -22,10 +22,6 @@ import java.util.Scanner;
 
 //controller for mapping all pages
 
-//DECIDE ON REMOVING CATEGORIES
-//ADD PASSWORD
-//OPTIMIZE
-
 @Controller
 public class DisplayController {
     @Autowired
@@ -34,8 +30,10 @@ public class DisplayController {
     //get mapping for the overview page
 	@GetMapping("/")
     public String mainPage(@RequestParam(name = "test", required = false) String test, Model model) {
+		List<User> users = dataBaseRepo.getUsers();
+		
 		model.addAttribute("test", test);
-        
+        model.addAttribute("users", users);
         return "main";
     }
 }

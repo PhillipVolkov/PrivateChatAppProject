@@ -20,17 +20,16 @@ public class DatabaseRepo {
     
 	//insert merchant into POSTGRES
     @Transactional
-    public void insertMerchant(Merchant merchant) {
-    	entityManager.createNativeQuery("insert into merchants (merchant_name, merchant_pattern, category_id) values (?,?,?)")
-        .setParameter(1, merchant.getName())
-        .setParameter(2, merchant.getPattern())
-        .setParameter(3, merchant.getCategoryId())
+    public void insertUser(User user) {
+    	entityManager.createNativeQuery("insert into users (user_name, user_password) values (?,?)")
+        .setParameter(1, user.getUsername())
+        .setParameter(2, user.getPassword())
         .executeUpdate();
     }
     
     //read merchants from hibernate entities
-    List<Merchant> getMerchants() {
-    	return entityManager.createQuery("select mer from Merchant mer", Merchant.class)
+    List<User> getUsers() {
+    	return entityManager.createQuery("select user from User user", User.class)
         		.getResultList();
     }
 }
