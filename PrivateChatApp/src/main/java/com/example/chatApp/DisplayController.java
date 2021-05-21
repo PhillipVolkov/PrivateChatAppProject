@@ -32,6 +32,10 @@ public class DisplayController {
     public String mainPage(@RequestParam(name = "test", required = false) String test, Model model) {
 		List<User> users = dataBaseRepo.getUsers();
 		
+		if (test == null) {
+			test = "";
+		}
+		
 		model.addAttribute("test", test);
         model.addAttribute("users", users);
         return "main";
