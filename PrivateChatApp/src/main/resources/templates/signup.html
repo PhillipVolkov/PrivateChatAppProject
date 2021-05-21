@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <title>Hello World</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="static.css" rel="stylesheet"/>
+    </head>
+    
+    <body>
+    	<form method="POST" th:action="@{/signup}" enctype="multipart/form-data">
+	        <div class="card">
+	        	<label>Username:</label> <input type="text" id="username" name="username"> <br>
+	        	<label>Password:</label> <input type="password" id="password" name="password"> <br>
+				<button type="submit" class="btn btn-primary">Submit!</button>
+			</div>
+        </form>
+    </body>
+</html>

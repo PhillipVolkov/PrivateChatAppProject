@@ -20,10 +20,10 @@ public class DatabaseRepo {
     
 	//insert merchant into POSTGRES
     @Transactional
-    public void insertUser(User user) {
+    public void insertUser(String username, String password) {
     	entityManager.createNativeQuery("insert into users (user_name, user_password) values (?,?)")
-        .setParameter(1, user.getUsername())
-        .setParameter(2, user.getPassword())
+        .setParameter(1, username)
+        .setParameter(2, password)
         .executeUpdate();
     }
     

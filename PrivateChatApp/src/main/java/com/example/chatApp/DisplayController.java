@@ -36,4 +36,18 @@ public class DisplayController {
         model.addAttribute("users", users);
         return "main";
     }
+	
+	//get mapping for the overview page
+	@GetMapping("/signup")
+    public String signup(Model model) {
+        return "signup";
+    }
+	
+	//get mapping for the overview page
+	@PostMapping("/signup")
+    public RedirectView newUser(@RequestParam(name = "username", required = true) String userName, @RequestParam(name = "password", required = true) String password, Model model) {
+		dataBaseRepo.insertUser(userName, password);
+		
+        return new RedirectView("/");
+    }
 }
