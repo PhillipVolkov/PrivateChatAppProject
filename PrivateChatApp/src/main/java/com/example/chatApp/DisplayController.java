@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.servlet.http.HttpSession;
+
 //controller for mapping all pages
 
 @Controller
@@ -29,29 +31,62 @@ public class DisplayController {
     
     //get mapping for the overview page
 	@GetMapping("/")
-    public String mainPage(@RequestParam(name = "test", required = false) String test, Model model) {
+    public String mainPage(HttpSession session, Model model) {
 		List<User> users = dataBaseRepo.getUsers();
+		List<Message> messages = null;
 		
-		if (test == null) {
-			test = "";
+		if (session.getAttribute("username") != null) {
+			messages = dataBaseRepo.getMessages(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId());
 		}
 		
-		model.addAttribute("test", test);
         model.addAttribute("users", users);
+        model.addAttribute("messages", messages);
+        model.addAttribute("username", session.getAttribute("username"));
         return "main";
     }
 	
-	//get mapping for the overview page
 	@GetMapping("/signup")
     public String signup(Model model) {
         return "signup";
     }
 	
-	//get mapping for the overview page
 	@PostMapping("/signup")
-    public RedirectView newUser(@RequestParam(name = "username", required = true) String userName, @RequestParam(name = "password", required = true) String password, Model model) {
+    public RedirectView newUser(@RequestParam(name = "username", required = true) String userName, @RequestParam(name = "password", required = true) String password, HttpSession session, Model model) {
 		dataBaseRepo.insertUser(userName, password);
 		
         return new RedirectView("/");
+    }
+	
+	@GetMapping("/login")
+    public String login(Model model) {
+        return "login";
+    }
+	
+	@PostMapping("/login")
+    public String verifyLogin(@RequestParam(name = "username", required = true) String userName, @RequestParam(name = "password", required = true) String password, HttpSession session, Model model) {
+		User user = null;
+		
+		try {
+			user = dataBaseRepo.getUser(userName);
+		}
+		catch (Exception e) {}
+		
+		if (user != null) {
+			if (user.getPassword().equals(password)) {
+				model.addAttribute("message", "success");
+				session.setAttribute("username", userName);
+		        return "login";
+			}
+		}
+		
+		model.addAttribute("message", "Username or password incorrect");
+		
+        return "login";
+    }
+	
+	@GetMapping("/logout")
+    public String logout(HttpSession session, Model model) {
+		session.removeAttribute("username");
+        return "main";
     }
 }

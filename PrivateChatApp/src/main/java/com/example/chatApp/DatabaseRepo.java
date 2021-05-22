@@ -18,7 +18,6 @@ public class DatabaseRepo {
     @PersistenceContext
     public EntityManager entityManager;
     
-	//insert merchant into POSTGRES
     @Transactional
     public void insertUser(String username, String password) {
     	entityManager.createNativeQuery("insert into users (user_name, user_password) values (?,?)")
@@ -27,9 +26,20 @@ public class DatabaseRepo {
         .executeUpdate();
     }
     
-    //read merchants from hibernate entities
     List<User> getUsers() {
     	return entityManager.createQuery("select user from User user", User.class)
+        		.getResultList();
+    }
+    
+    User getUser(String username) {
+    	return entityManager.createQuery("select user from User user where user_name = ?1", User.class)
+    			.setParameter(1, username)
+        		.getSingleResult();
+    }
+    
+    List<Message> getMessages(Long recipientId) {
+    	return entityManager.createQuery("select mes from Message mes where recipient_id = ?1", Message.class)
+    			.setParameter(1, recipientId)
         		.getResultList();
     }
 }

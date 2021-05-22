@@ -10,28 +10,29 @@
     </head>
     
     <body>
-    	<div><h1 th:text="${'Hello! ' + test}"></h1></div>
-    	
     	<div>
-    		<a href="/signup">Sign Up</a>
+    		<h1 th:if="${username == null}">Hello!</h1>
+    		<h1 th:unless="${username == null}" th:text="${'Hello, ' + username + '!'}"></h1>
+    	
+    		<a th:if="${username == null}" href="/login">Login</a>
+    		<a th:if="${username == null}" href="/signup">Sign Up</a>
+    		<a th:unless="${username == null}" href="/logout">Logout</a>
     	</div>
     	
-    	<div>
-	    	<h3>Users</h3>
+    	<div class="card" th:unless="${username == null}">
+	    	<h3>Messages</h3>
 	       	<table>
 	           <thead>
 	           	<tr>
-	                <th>ID</th>
-	                <th>Name</th>
-	                <th>Password</th>
+	                <th>Sender</th>
+	                <th>Contents</th>
 	            </tr>
 	           </thead>
 	           
 	           <tbody>
-	            <tr th:each="user : ${users}">
-	                <td th:text="${user.getId()}"></td>
-	                <td th:text="${user.getUsername()}"></td>
-	                <td th:text="${user.getPassword()}"></td>
+	            <tr th:each="message : ${messages}">
+	                <td th:text="${message.getRecipient()}"></td>
+	                <td th:text="${message.getContents()}"></td>
 	            </tr>
 	           </tbody>
 	        </table>
