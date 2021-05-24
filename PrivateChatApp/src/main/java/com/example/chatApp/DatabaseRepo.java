@@ -60,9 +60,10 @@ public class DatabaseRepo {
         		.getSingleResult();
     }
     
-    List<Message> getMessages(Long recipientId) {
-    	return entityManager.createQuery("select mes from Message mes where sender_id=?1 OR recipient_id = ?1", Message.class)
-    			.setParameter(1, recipientId)
+    List<Message> getMessages(Long userId, Long friendId) {
+    	return entityManager.createQuery("select mes from Message mes where (sender_id=?1 AND recipient_id=?2) OR (recipient_id=?1 AND sender_id=?2)", Message.class)
+    			.setParameter(1, userId)
+    			.setParameter(2, friendId)
         		.getResultList();
     }
     

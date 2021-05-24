@@ -51,7 +51,7 @@ public class DisplayController {
 				}
 				
 				if (friendSelect != null) {
-					messages = dataBaseRepo.getMessages(dataBaseRepo.getUser(friendSelect).getId());
+					messages = dataBaseRepo.getMessages(user.getId(), dataBaseRepo.getUser(friendSelect).getId());
 				}
 			}
 			catch(Exception e) {
