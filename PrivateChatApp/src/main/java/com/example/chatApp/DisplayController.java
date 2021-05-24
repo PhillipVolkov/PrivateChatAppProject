@@ -43,6 +43,7 @@ public class DisplayController {
 				friends = new ArrayList<User>();
 				for (Friend friend : dataBaseRepo.getFriends(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId())) {
 					friends.add(dataBaseRepo.getUserById(friend.getFriend()));
+					System.out.println(friend.getFriend());
 				}
 				
 				if (friendSelect == null && friends.size() != 0) {

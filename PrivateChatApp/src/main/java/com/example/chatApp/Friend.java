@@ -10,6 +10,7 @@ import javax.persistence.Table;
 @Table(name="friends")
 public class Friend {
 	@Id
+    private Long friend_id;
     private Long user_id;
 	private Long user_friend;
 	
