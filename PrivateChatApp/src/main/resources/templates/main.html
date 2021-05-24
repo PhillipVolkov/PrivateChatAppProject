@@ -11,15 +11,33 @@
     
     <body>
     	<div>
-    		<h1 th:if="${username == null}">Hello!</h1>
-    		<h1 th:unless="${username == null}" th:text="${'Hello, ' + username + '!'}"></h1>
+    		<h1 th:if="${user == null}">Hello!</h1>
+    		<h1 th:unless="${user == null}" th:text="${'Hello, ' + user.getUsername() + '!'}"></h1>
     	
-    		<a th:if="${username == null}" href="/login">Login</a>
-    		<a th:if="${username == null}" href="/signup">Sign Up</a>
-    		<a th:unless="${username == null}" href="/logout">Logout</a>
+    		<a th:if="${user == null}" href="/login">Login</a>
+    		<a th:if="${user == null}" href="/signup">Sign Up</a>
+    		<a th:unless="${user == null}" href="/logout">Logout</a>
     	</div>
     	
-    	<div class="card" th:unless="${username == null}">
+    	<div class="card" th:unless="${user == null}">
+    		<br>
+    		<form method="POST" th:action="@{/}" enctype="multipart/form-data">
+				<label>Add a Friend:</label><input type="text" id="friendName" name="friendName" placeholder="FriendUsername">
+    		</form>
+    	
+    		<select name="friendSelect" id="friendSelect" th:attr="onchange=|updateFriend(this.value)|">
+   					<div th:each="friend : ${friends}">
+   						<div th:if="${friend.getUsername().equals(friendSelect)}">
+   							<option th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" selected></option>
+   						</div>
+   						<div th:unless="${friend.getUsername().equals(friendSelect)}">
+   							<option th:value="${friend.getUsername()}" th:text="${friend.getUsername()}"></option>
+   						</div>
+      				</div>
+       		</select>
+    	</div>
+    	
+    	<div class="card" th:unless="${user == null}">
 	    	<h3>Messages</h3>
 	       	<table>
 	           <thead>
@@ -31,11 +49,24 @@
 	           
 	           <tbody>
 	            <tr th:each="message : ${messages}">
-	                <td th:text="${message.getRecipient()}"></td>
+	                <td th:if="${message.getSender().equals(user.getId())}">You</td>
+	                <td th:unless="${message.getSender().equals(user.getId())}">Them</td>
 	                <td th:text="${message.getContents()}"></td>
 	            </tr>
 	           </tbody>
 	        </table>
+	        
+	        <br>
+	        <form method="POST" th:action="@{/}" enctype="multipart/form-data">
+				<label>New Message:</label><input type="text" id="message" name="message" placeholder="">
+				<input type="hidden" name="friendSelectHidden" th:value="${friendSelect}">
+    		</form>
     	</div>
     </body>
+    
+    <script th:inline="javascript">
+		function updateFriend(val) {
+			location.href = '/?friendSelect=' + val;
+		}
+	</script>
 </html>

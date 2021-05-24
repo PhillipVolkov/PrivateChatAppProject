@@ -31,18 +31,54 @@ public class DisplayController {
     
     //get mapping for the overview page
 	@GetMapping("/")
-    public String mainPage(HttpSession session, Model model) {
-		List<User> users = dataBaseRepo.getUsers();
+    public String mainPage(@RequestParam(name = "friendSelect", required = false) String friendSelect, HttpSession session, Model model) {
+		User user = null;
 		List<Message> messages = null;
+		List<User> friends = null;
 		
 		if (session.getAttribute("username") != null) {
-			messages = dataBaseRepo.getMessages(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId());
+			try {
+				user = dataBaseRepo.getUser(session.getAttribute("username").toString());
+				
+				friends = new ArrayList<User>();
+				for (Friend friend : dataBaseRepo.getFriends(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId())) {
+					friends.add(dataBaseRepo.getUserById(friend.getFriend()));
+				}
+				
+				if (friendSelect == null && friends.size() != 0) {
+					friendSelect = friends.get(0).getUsername();
+				}
+				
+				if (friendSelect != null) {
+					messages = dataBaseRepo.getMessages(dataBaseRepo.getUser(friendSelect).getId());
+				}
+			}
+			catch(Exception e) {
+				messages = null;
+			}
 		}
 		
-        model.addAttribute("users", users);
+        model.addAttribute("user", user);
+        model.addAttribute("friends", friends);
+        model.addAttribute("friendSelect", friendSelect);
         model.addAttribute("messages", messages);
-        model.addAttribute("username", session.getAttribute("username"));
         return "main";
+    }
+	
+	@PostMapping("/")
+    public RedirectView updateMain(@RequestParam(name = "friendName", required = false) String friendName, @RequestParam(name = "message", required = false) String message, 
+    		@RequestParam(name = "friendSelectHidden", required = false) String friendSelect, HttpSession session, Model model) {
+		String url = "";
+		
+		if (friendName != null) {
+			dataBaseRepo.insertFriend(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendName).getId());
+		}
+		else if (message != null) {
+			dataBaseRepo.insertMessage(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendSelect).getId(), message);
+			url += "?friendSelect="+friendSelect;
+		}
+		
+        return new RedirectView("/" + url);
     }
 	
 	@GetMapping("/signup")
