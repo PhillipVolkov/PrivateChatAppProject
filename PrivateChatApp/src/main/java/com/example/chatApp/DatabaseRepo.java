@@ -72,4 +72,17 @@ public class DatabaseRepo {
     			.setParameter(1, userId)
         		.getResultList();
     }
+    
+    List<Friend> getFriendRequests(Long userId) {
+    	return entityManager.createQuery("select fri from Friend fri where user_friend = ?1 AND (select count(fri2) from Friend fri2 where user_id = ?1 AND user_friend = fri.user_id) = 0", Friend.class)
+    			.setParameter(1, userId)
+        		.getResultList();
+    }
+    
+    Friend getFriend(Long user, Long friend) {
+    	return entityManager.createQuery("select fri from Friend fri where user_id = ?1 AND user_friend = ?2", Friend.class)
+    			.setParameter(1, user)
+    			.setParameter(2, friend)
+        		.getSingleResult();
+    }
 }

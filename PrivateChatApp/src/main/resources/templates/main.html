@@ -37,8 +37,25 @@
        		</select>
     	</div>
     	
-    	<div class="card" th:unless="${user == null}">
-	    	<h3>Messages</h3>
+    	<div class="card" th:if="${friendRequests.size() != 0}">
+	   		<table>
+	           <thead>
+	           	<tr>
+	                <th>Friend requests:</th>
+	            </tr>
+	           </thead>
+	           
+	           <tbody>
+	            <tr th:each="friend : ${friendRequests}">
+	                <td th:text="${friend.getUsername()}"></td>
+	            </tr>
+	           </tbody>
+	        </table>
+    	</div>
+    	
+    	<div class="card" th:if="${user != null && friends.size() != 0}">
+	    	<h4 th:if="${followed}">Status: followed</h4>
+	    	<h4 th:if="${!followed}">Status: NOT followed</h4>
 	       	<table>
 	           <thead>
 	           	<tr>
