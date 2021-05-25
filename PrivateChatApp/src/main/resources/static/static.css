@@ -7,16 +7,63 @@ body {
 	padding: 0px;
 }
 
-.mainPage {
+@media screen and (min-width: 720px) {
+	.mainPage {
+		padding:10px;
+		display: grid;
+		grid-template-columns: auto-fit auto-fit;
+		grid-template-rows: auto-fit auto-fit auto-fit;
+		
+		grid-gap: 10px;
+		padding: 10px;
+		margin-right: 10px;
+	}
+	
+	.leftElem {
+		grid-row: 2;
+		grid-column: 1;
+	}
+	
+	.rightElem {
+		grid-row: 2;
+		grid-column: 2/12;
+	}
+}
+
+@media screen and (max-width: 720px) {
+	.mainPage {
+		padding:10px;
+		display: grid;
+		grid-template-columns: auto-fit auto-fit;
+		grid-template-rows: auto-fit auto-fit auto-fit;
+		
+		grid-gap: 10px;
+		padding: 10px;
+		margin-right: 10px;
+	}
+
+	.leftElem {
+		grid-row: 2;
+		grid-column: 1;
+	}
+	
+	.rightElem {
+		grid-row: 3;
+		grid-column: 1;
+	}
+}
+
+.singleElem {
 	padding:10px;
 	display: grid;
-	grid-template-columns: 20% 80%;
+	grid-template-columns: 100%;
 	grid-template-rows: auto-fit auto-fit auto-fit;
 	
 	grid-gap: 10px;
 	padding: 10px;
 	margin-right: 10px;
 }
+
 
 .topnav {
 	display: flex;

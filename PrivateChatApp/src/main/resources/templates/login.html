@@ -3,24 +3,23 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
     <head>
-        <title>Hello World</title>
+        <title>Chat App</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="static.css" rel="stylesheet"/>
     </head>
     
     <body>
-    	<div class="mainPage">
+    	<div class="singleElem">
 	    	<form method="POST" th:action="@{/login}" enctype="multipart/form-data">
 		        <div class="card">
 		        	<label>Username:</label> <input type="text" id="username" name="username"> <br>
 		        	<label>Password:</label> <input type="password" id="password" name="password"> <br>
+		        	<p th:text="${message}"></p>
+		        	<br>
 					<button type="submit" class="btn btn-primary">Submit!</button>
 				</div>
 	        </form>
-	        
-	        <div class="card">
-	        	<p th:text="${message}"></p>
 	        </div>
         </div>
     </body>

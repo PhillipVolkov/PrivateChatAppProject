@@ -91,7 +91,15 @@ public class DisplayController {
 		String url = "";
 		
 		if (friendName != null) {
-			dataBaseRepo.insertFriend(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendName).getId());
+			try {
+				dataBaseRepo.getFriend(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendName).getId());
+			}
+			catch(Exception e) {
+				try {
+					dataBaseRepo.insertFriend(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendName).getId());
+				}
+				catch(Exception ee) {}
+			}
 		}
 		else if (message != null) {
 			dataBaseRepo.insertMessage(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendSelect).getId(), message);
