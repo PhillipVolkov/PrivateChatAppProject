@@ -72,7 +72,10 @@ public class DisplayController {
 
 			friendRequests = new ArrayList<User>();
 			for (Friend friend : dataBaseRepo.getFriendRequests(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId())) {
-				friendRequests.add(dataBaseRepo.getUserById(friend.getId()));
+				try {
+					friendRequests.add(dataBaseRepo.getUserById(friend.getId()));
+				}
+				catch (Exception e) {}
 			}
 		}
 		
