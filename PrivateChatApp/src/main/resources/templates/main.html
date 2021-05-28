@@ -88,8 +88,23 @@
     </body>
     
     <script th:inline="javascript">
+	 	/*[+
+			var user = [[${user}]];
+			var friendId = [[${friendId}]];
+		+]*/
+
 		function updateFriend(val) {
 			location.href = '/?friendSelect=' + val;
 		}
+		
+		var prevMsg = "";
+		var sse = new EventSource('http://10.0.0.149:8081/sse');
+		sse.onmessage = function (evt) {
+			if (prevMsg != evt['data'] && prevMsg != "") {
+				location.reload();
+			}
+			
+			prevMsg = evt['data'];
+		};
 	</script>
 </html>

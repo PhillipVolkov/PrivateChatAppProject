@@ -67,6 +67,12 @@ public class DatabaseRepo {
         		.getResultList();
     }
     
+    List<Message> getCurrentMessages() {
+    	return entityManager.createQuery("select mes from Message mes order by mes.message_id desc", Message.class)
+    			.setMaxResults(20)
+        		.getResultList();
+    }
+    
     List<Friend> getFriends(Long userId) {
     	return entityManager.createQuery("select fri from Friend fri where user_id = ?1", Friend.class)
     			.setParameter(1, userId)

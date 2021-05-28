@@ -5,20 +5,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.opencsv.bean.CsvToBeanBuilder;
-import com.opencsv.enums.CSVReaderNullFieldIndicator;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.file.FileSystemNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpSession;
 
@@ -29,6 +22,24 @@ public class DisplayController {
     @Autowired
     private DatabaseRepo dataBaseRepo;
     
+    private ExecutorService nonBlockingService = Executors
+      .newCachedThreadPool();
+    
+    @GetMapping("/sse")
+    public SseEmitter handleSse(HttpSession session) {
+		SseEmitter emitter = new SseEmitter();
+		
+		nonBlockingService.execute(() -> {
+			try {
+				emitter.send(dataBaseRepo.getMessages(Long.parseLong(session.getAttribute("userId").toString()), Long.parseLong(session.getAttribute("selectedFriend").toString())));
+				emitter.complete();
+			} catch (Exception e) {
+				System.out.println("SSE ERROR");
+			}
+		});
+		return emitter;
+	}   
+    
     //get mapping for the overview page
 	@GetMapping("/")
     public String mainPage(@RequestParam(name = "friendSelect", required = false) String friendSelect, HttpSession session, Model model) {
@@ -37,6 +48,7 @@ public class DisplayController {
 		List<User> friends = null;
 		boolean followed = false;
 		List<User> friendRequests = null;
+		Long friendId = null;
 		
 		if (session.getAttribute("username") != null) {
 			user = dataBaseRepo.getUser(session.getAttribute("username").toString());
@@ -54,6 +66,8 @@ public class DisplayController {
 				boolean isFriend = false;
 				for (User friend : friends) {
 					if (friend.getUsername().equals(friendSelect)) {
+						friendId = friend.getId();
+						session.setAttribute("selectedFriend", friendId);
 						isFriend = true;
 						break;
 					}
@@ -81,6 +95,7 @@ public class DisplayController {
 		
         model.addAttribute("user", user);
         model.addAttribute("friends", friends);
+        model.addAttribute("friendId", friendId);
         model.addAttribute("friendSelect", friendSelect);
         model.addAttribute("followed", followed);
         model.addAttribute("friendRequests", friendRequests);
@@ -142,6 +157,7 @@ public class DisplayController {
 			if (user.getPassword().equals(password)) {
 				model.addAttribute("message", "success");
 				session.setAttribute("username", userName);
+				session.setAttribute("userId", user.getId());
 		        return "login";
 			}
 		}
