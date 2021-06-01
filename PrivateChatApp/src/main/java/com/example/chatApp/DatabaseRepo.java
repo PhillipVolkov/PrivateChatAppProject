@@ -64,7 +64,7 @@ public class DatabaseRepo {
     	return entityManager.createQuery("select mes from Message mes where (sender_id=?1 AND recipient_id=?2) OR (recipient_id=?1 AND sender_id=?2)", Message.class)
     			.setParameter(1, userId)
     			.setParameter(2, friendId)
-    			.setMaxResults0)
+    			.setMaxResults(100)
         		.getResultList();
     }
     
