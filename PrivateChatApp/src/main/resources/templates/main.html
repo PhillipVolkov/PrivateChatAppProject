@@ -31,6 +31,7 @@
 		    		<div th:if="${friendRequests.size() != 0}">
 			    		<hr class="solid">
 			    		<h3>Friend requests:</h3>
+			    		
 				   		<table>
 				           <tbody>
 				            <tr th:each="friend : ${friendRequests}">
@@ -42,13 +43,15 @@
 		    	
 			    	<hr class="solid">
 			    	
-					<div th:each="friend : ${friends}">
-						<div th:if="${friend.getUsername().equals(friendSelect)}">
-							<button class="selected" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
-						</div>
-						<div th:unless="${friend.getUsername().equals(friendSelect)}">
-							<button th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
-						</div>
+			    	<div class="friendFeed" id="friendFeed">
+						<div th:each="friend : ${friends}">
+							<div th:if="${friend.getUsername().equals(friendSelect)}">
+								<button class="selected" id="selectedFriend" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+							</div>
+							<div th:unless="${friend.getUsername().equals(friendSelect)}">
+								<button th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+							</div>
+		   				</div>
 	   				</div>
 		    	</div>
 	    	</div>
@@ -60,26 +63,27 @@
 			    	<h3 th:if="${!followed}">They have NOT followed you back!</h3>
 		    		<hr th:if="${!followed}" class="solid">
 		    		
-			       	<table>
-			           <thead>
-			           	<tr>
-			                <th>Sender</th>
-			                <th>Contents</th>
-			            </tr>
-			           </thead>
-			           
-			           <tbody>
-			            <tr th:each="message : ${messages}">
-			                <td th:if="${message.getSender().equals(user.getId())}">You</td>
-			                <td th:unless="${message.getSender().equals(user.getId())}">Them</td>
-			                <td th:text="${message.getContents()}"></td>
-			            </tr>
-			           </tbody>
-			        </table>
+		    		<div class="messageFeed" id="messageFeed">
+			            <div th:each="message : ${messages}">
+			                <div th:if="${message.getSender().equals(user.getId())}" class="messagesL">
+			                	<span class="emptyMessageL"></span>
+			                	<span class="yourMessage" th:text="${message.getContents()}"></span>
+			                </div>
+			                
+			                <div th:unless="${message.getSender().equals(user.getId())}" class="messagesR">
+			                	<span class="thierMessage" th:text="${message.getContents()}"></span>
+			                	<span class="emptyMessageR"></span>
+			                </div>
+			            </div>
+		            </div>
 			        
 			        <hr class="solid">
-			        <form method="POST" th:action="@{/}" enctype="multipart/form-data">
-						<label>New Message: </label><input type="text" id="message" name="message" placeholder="">
+			        <form method="POST" th:action="@{/}" enctype="multipart/form-data" id="messageForm">
+			        	<div class="messageGrid">
+							<textarea class="leftSideElem" id="message" name="message" placeholder="New Message:" rows=3 onkeypress="textAreaEnter(event)"></textarea>
+							<button class="rightSideElem" type="submit" style="height:100%">Send</button>
+						</div>
+						
 						<input type="hidden" name="friendSelectHidden" th:value="${friendSelect}">
 		    		</form>
 		    	</div>
@@ -92,9 +96,19 @@
 			var user = [[${user}]];
 			var friendId = [[${friendId}]];
 		+]*/
+		
+		document.getElementById("messageFeed").scrollTop = document.getElementById("messageFeed").scrollHeight;
+		document.getElementById("friendFeed").scrollTop = document.getElementById("selectedFriend").offsetTop - document.getElementById("friendFeed").offsetTop;
 
 		function updateFriend(val) {
 			location.href = '/?friendSelect=' + val;
+		}
+		
+		function textAreaEnter(event) {
+			//if (event.keyCode == 13 && !event.shiftKey) {
+			//	event.preventDefault();
+			//	document.getElementById("messageForm").submit();
+			//}
 		}
 		
 		var prevMsg = "";
