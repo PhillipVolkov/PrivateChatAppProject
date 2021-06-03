@@ -65,6 +65,22 @@
 		    		
 		    		<div class="messageFeed" id="messageFeed">
 			            <div th:each="message,iter : ${messages}">
+			            	<div th:if="${message.getTimeStamp() != null}">
+			            		<div th:if="${iter.index != 0}">
+			            			<div th:if="${messages.get(iter.index-1).getTimeStamp() != null}">
+		                				<p th:if="${!messages.get(iter.index-1).getDateString().equals(message.getDateString())}" style="font-size:16px; text-align:center" th:text="${message.getDateString()}"></p>
+		                			</div>
+		                			<div th:if="${messages.get(iter.index-1).getTimeStamp() == null}">
+		                				<p style="font-size:16px; text-align:center" th:text="${message.getDateString()}"></p>
+		                			</div>
+			            		
+				            		<div th:if="${messages.get(iter.index-1).getTimeStamp() != null}">
+		                				<p th:if="${!messages.get(iter.index-1).getTimeString().equals(message.getTimeString()) && message.getSender().equals(user.getId())}" style="font-size:11px; text-align:right" th:text="${message.getTimeString()}"></p>
+		                				<p th:if="${!messages.get(iter.index-1).getTimeString().equals(message.getTimeString()) && !message.getSender().equals(user.getId())}" style="font-size:11px; text-align:left" th:text="${message.getTimeString()}"></p>
+		                			</div>
+	                			</div>
+	                		</div>
+			            
 			                <div th:if="${message.getSender().equals(user.getId())}" class="messagesL">
 			                	<span class="emptyMessageL"></span>
 			                	<span class="yourMessage" th:text="${message.getContents()}"></span>
@@ -141,6 +157,8 @@
 		var sse = new EventSource('http://10.0.0.149:8081/sse');
 		
 		sse.onmessage = function (evt) {
+			console.log(evt);
+			
 			if (!document.hidden) {
 				checkUpdates(evt['data']);
 			}

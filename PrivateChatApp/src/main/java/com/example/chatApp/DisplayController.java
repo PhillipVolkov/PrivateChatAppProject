@@ -31,10 +31,14 @@ public class DisplayController {
 		
 		nonBlockingService.execute(() -> {
 			try {
-				emitter.send(dataBaseRepo.getMessages(Long.parseLong(session.getAttribute("userId").toString()), Long.parseLong(session.getAttribute("selectedFriend").toString())));
+				emitter.send(dataBaseRepo.getLatestMessage(Long.parseLong(session.getAttribute("userId").toString()), Long.parseLong(session.getAttribute("selectedFriend").toString())));
 				emitter.complete();
 			} catch (Exception e) {
-				System.out.println("SSE ERROR");
+				System.out.println(e.getMessage());
+				for (StackTraceElement s : e.getStackTrace()) {
+					System.out.println(s.toString());
+				}
+				System.out.println();
 			}
 		});
 		return emitter;
@@ -131,7 +135,7 @@ public class DisplayController {
 			}
 		}
 		else if (message != null) {
-			if (!message.equals("")) dataBaseRepo.insertMessage(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendSelect).getId(), message);
+			if (!message.equals("")) dataBaseRepo.insertMessage(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendSelect).getId(), message, new java.sql.Timestamp(System.currentTimeMillis()));
 			
 			url += "?friendSelect="+friendSelect;
 		}
@@ -146,22 +150,25 @@ public class DisplayController {
     }
 	
 	@PostMapping("/signup")
-    public String newUser(@RequestParam(name = "name", required = true) String name, @RequestParam(name = "email", required = true) String email, @RequestParam(name = "conpass", required = true) String conpass, @RequestParam(name = "username", required = true) String userName, @RequestParam(name = "password", required = true) String password, HttpSession session, Model model) {
-	
-        
+    public String newUser(@RequestParam(name = "name", required = true) String name, @RequestParam(name = "email", required = true) String email, 
+    		@RequestParam(name = "conpass", required = true) String conpass, @RequestParam(name = "username", required = true) String userName, 
+    		@RequestParam(name = "password", required = true) String password, HttpSession session, Model model) {
+		
         if (password.contentEquals(conpass)){
-            dataBaseRepo.insertUser(userName, password, name, email);
+        	try {
+        		dataBaseRepo.insertUser(userName, password, name, email);
+        	}
+        	catch (Exception e) {
+        		model.addAttribute("message", e.getMessage());   
+    	        return "signup";
+        	}
+        	
             return "main";
-        } 
+        }
+        
         model.addAttribute("message", "Passwords do not match");        
         return "signup";
-                
-    }   
-  
-        
-		
-        
-    
+    }
 	
 	@GetMapping("/login")
     public String login(Model model) {

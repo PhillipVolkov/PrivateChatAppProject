@@ -37,11 +37,12 @@ public class DatabaseRepo {
     }
     
     @Transactional
-    public void insertMessage(Long sender, Long recipient, String message) {
-    	entityManager.createNativeQuery("insert into messages (sender_id, recipient_id, message_content) values (?,?,?)")
+    public void insertMessage(Long sender, Long recipient, String message, java.sql.Timestamp time) {
+    	entityManager.createNativeQuery("insert into messages (sender_id, recipient_id, message_content, message_time) values (?,?,?,?)")
         .setParameter(1, sender)
         .setParameter(2, recipient)
         .setParameter(3, message)
+        .setParameter(4, time)
         .executeUpdate();
     }
     
@@ -77,10 +78,12 @@ public class DatabaseRepo {
         		.getResultList();
     }
     
-    List<Message> getCurrentMessages() {
-    	return entityManager.createQuery("select mes from Message mes order by mes.message_id desc", Message.class)
-    			.setMaxResults(20)
-        		.getResultList();
+    Message getLatestMessage(Long userId, Long friendId) {
+    	return entityManager.createQuery("select mes from Message mes where (sender_id=?1 AND recipient_id=?2) OR (recipient_id=?1 AND sender_id=?2) order by mes.id desc", Message.class)
+    			.setParameter(1, userId)
+    			.setParameter(2, friendId)
+    			.setMaxResults(1)
+    			.getSingleResult();
     }
     
     List<Friend> getFriends(Long userId) {
@@ -101,6 +104,4 @@ public class DatabaseRepo {
     			.setParameter(2, friend)
         		.getSingleResult();
     }
-
-   
 }
