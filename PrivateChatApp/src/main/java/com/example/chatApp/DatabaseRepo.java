@@ -19,10 +19,12 @@ public class DatabaseRepo {
     public EntityManager entityManager;
     
     @Transactional
-    public void insertUser(String username, String password) {
-    	entityManager.createNativeQuery("insert into users (user_name, user_password) values (?,?)")
+    public void insertUser(String username, String password, String name, String email) {
+    	entityManager.createNativeQuery("insert into users (user_name, user_password, user_pname, user_email) values (?,?,?,?)")
         .setParameter(1, username)
         .setParameter(2, password)
+        .setParameter(3, name)
+        .setParameter(4, email)
         .executeUpdate();
     }
     
@@ -85,4 +87,6 @@ public class DatabaseRepo {
     			.setParameter(2, friend)
         		.getSingleResult();
     }
+
+   
 }

@@ -7,15 +7,21 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="static.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="../static/static.css" type="text/css">
+
     </head>
     
     <body>
     	<div class="singleElem">
 	    	<form method="POST" th:action="@{/signup}" enctype="multipart/form-data">
 		        <div class="card">
-		        	<label>Username:</label> <input type="text" id="username" name="username"> <br>
-		        	<label>Password:</label> <input type="password" id="password" name="password"> <br>
+                            <label>Name:</label> <input type="name" id="name" name="name"> <br>
+                            <label>Email:</label> <input type="email" id="email" name="email"> <br>
+                            <label>Username:</label> <input type="text" id="username" name="username"> <br>
+                            <label>Password:</label> <input type="password" id="password" name="password"> <br>
+                            <label>Confirm Password:</label> <input type="password" id="conpass" name="conpass"> <br>
 					<button type="submit" class="btn btn-primary">Submit!</button>
+                                        <p th:text="${message}"></p>
 				</div>
 	        </form>
         </div>
