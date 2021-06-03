@@ -94,7 +94,7 @@
 			        <hr class="solid">
 			        <form method="POST" th:action="@{/}" enctype="multipart/form-data" id="messageForm" onsubmit="validateMessage(event)">
 			        	<div class="messageGrid">
-							<textarea class="leftSideElem" style="resize: none;" id="message" name="message" placeholder="New Message:" rows=3 onkeypress="textAreaEnter(event)"></textarea>
+							<textarea class="leftSideElem" style="resize:none; padding:5px;" id="message" name="message" placeholder="New Message:" rows=3 onkeypress="textAreaEnter(event)"></textarea>
 							<button class="rightSideElem" type="submit" style="height:100%">Send</button>
 						</div>
 						
@@ -137,16 +137,37 @@
 		}
 		
 		var prevMsg = "";
+		var lastMsg = "";
 		var sse = new EventSource('http://10.0.0.149:8081/sse');
 		
 		sse.onmessage = function (evt) {
-			console.log(evt['data']);
+			if (!document.hidden) {
+				checkUpdates(evt['data']);
+			}
 			
-			if (prevMsg != evt['data'] && prevMsg != "") {
+			lastMsg = evt['data'];
+		};
+		
+		window.onload = function() {
+			if (document.cookie != "") {
+				document.getElementById("message").value = document.cookie.split("=")[1];
+				document.cookie = "messageText=; expires=Thu, 18 Dec 2013 12:00:00 UTC";
+			}
+			
+			document.getElementById("message").focus();
+		};
+		
+		window.onfocus = function() {
+			checkUpdates(lastMsg);
+		};
+		
+		function checkUpdates(data) {
+			if (prevMsg != data && prevMsg != "") {
+				document.cookie = "messageText=" + document.getElementById("message").value;
 				location.reload();
 			}
 			
-			prevMsg = evt['data'];
-		};
+			prevMsg = data;
+		}
 	</script>
 </html>

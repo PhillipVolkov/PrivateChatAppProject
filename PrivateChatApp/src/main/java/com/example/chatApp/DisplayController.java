@@ -74,7 +74,12 @@ public class DisplayController {
 				}
 				
 				if (isFriend) {
-					messages = dataBaseRepo.getMessages(user.getId(), dataBaseRepo.getUser(friendSelect).getId());
+					List<Message> tempMessages = dataBaseRepo.getMessages(user.getId(), dataBaseRepo.getUser(friendSelect).getId());
+					
+					messages = new ArrayList<Message>();
+					for (int i = tempMessages.size()-1; i >= 0; i--) {
+						messages.add(tempMessages.get(i));
+					}
 					
 					try {
 						dataBaseRepo.getFriend(dataBaseRepo.getUser(friendSelect).getId(), user.getId());
