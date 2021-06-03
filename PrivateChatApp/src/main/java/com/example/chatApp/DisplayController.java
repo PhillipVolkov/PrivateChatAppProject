@@ -31,7 +31,7 @@ public class DisplayController {
 		
 		nonBlockingService.execute(() -> {
 			try {
-				emitter.send(dataBaseRepo.getLatestMessage(Long.parseLong(session.getAttribute("userId").toString()), Long.parseLong(session.getAttribute("selectedFriend").toString())));
+				emitter.send(dataBaseRepo.getMessages(Long.parseLong(session.getAttribute("userId").toString()), Long.parseLong(session.getAttribute("selectedFriend").toString())));
 				emitter.complete();
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
@@ -120,7 +120,7 @@ public class DisplayController {
 	
 	@PostMapping("/")
     public RedirectView updateMain(@RequestParam(name = "friendName", required = false) String friendName, @RequestParam(name = "message", required = false) String message, 
-    		@RequestParam(name = "friendSelectHidden", required = false) String friendSelect, HttpSession session, Model model) {
+    		@RequestParam(name = "friendSelectHidden", required = false) String friendSelect, @RequestParam(name = "remove", required = false) String removeFriend, HttpSession session, Model model) {
 		String url = "";
 		
 		if (friendName != null) {
@@ -130,6 +130,7 @@ public class DisplayController {
 			catch(Exception e) {
 				try {
 					dataBaseRepo.insertFriend(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendName).getId());
+					if (!friendSelect.equals("")) url += "?friendSelect="+friendSelect;
 				}
 				catch(Exception ee) {}
 			}
@@ -138,6 +139,11 @@ public class DisplayController {
 			if (!message.equals("")) dataBaseRepo.insertMessage(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendSelect).getId(), message, new java.sql.Timestamp(System.currentTimeMillis()));
 			
 			url += "?friendSelect="+friendSelect;
+		}
+		else if (removeFriend != null) {
+			Long id = Long.parseLong(removeFriend);
+			
+			dataBaseRepo.removeFriend(Long.parseLong(session.getAttribute("userId").toString()), id);
 		}
 		
         return new RedirectView("/" + url);

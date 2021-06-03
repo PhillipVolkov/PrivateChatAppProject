@@ -26,6 +26,7 @@
 		    		
 		    		<form method="POST" th:action="@{/}" enctype="multipart/form-data">
 						<label>Add a Friend: </label><input type="text" id="friendName" name="friendName" placeholder="FriendUsername">
+						<input type="hidden" name="friendSelectHidden" th:value="${friendSelect}">
 		    		</form>
 		    		
 		    		<div th:if="${friendRequests.size() != 0}">
@@ -45,11 +46,15 @@
 			    	
 			    	<div class="friendFeed" id="friendFeed">
 						<div th:each="friend : ${friends}">
-							<div th:if="${friend.getUsername().equals(friendSelect)}">
-								<button class="selected" id="selectedFriend" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
-							</div>
-							<div th:unless="${friend.getUsername().equals(friendSelect)}">
-								<button th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+							<div class="twoElemGrid">
+								<div th:if="${friend.getUsername().equals(friendSelect)}">
+									<button class="rightSideElem" style="background-color:#bbb;color:black;" id="selectedFriend" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+								</div>
+								<div th:unless="${friend.getUsername().equals(friendSelect)}">
+									<button class="rightSideElem" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+								</div>
+								
+								<button class="leftSideElem" name="remove" th:value="${friend.getId()}" style="background-color:red;" th:attr="onclick=|removeFriend(this.value)|">X</button>
 							</div>
 		   				</div>
 	   				</div>
@@ -75,9 +80,24 @@
 		                			</div>
 			            		
 				            		<div th:if="${messages.get(iter.index-1).getTimeStamp() != null}">
-		                				<p th:if="${!messages.get(iter.index-1).getTimeString().equals(message.getTimeString()) && message.getSender().equals(user.getId())}" style="font-size:11px; text-align:right" th:text="${message.getTimeString()}"></p>
-		                				<p th:if="${!messages.get(iter.index-1).getTimeString().equals(message.getTimeString()) && !message.getSender().equals(user.getId())}" style="font-size:11px; text-align:left" th:text="${message.getTimeString()}"></p>
+		                				<div th:if="${(!messages.get(iter.index-1).getTimeString().equals(message.getTimeString()) && message.getSender().equals(user.getId())) || 
+		                				(!messages.get(iter.index-1).getSender().equals(user.getId()) && message.getSender().equals(user.getId()))}">
+		                					<p style="font-size:11px; text-align:right" th:inline="text"><b th:text="${user.getUsername()}"></b> [[${' ' + message.getTimeString()}]]</p>
+		                				</div>
+		                				<div th:if="${(!messages.get(iter.index-1).getTimeString().equals(message.getTimeString()) && !message.getSender().equals(user.getId())) ||
+		                				(messages.get(iter.index-1).getSender().equals(user.getId()) && !message.getSender().equals(user.getId()))}">
+		                					<p style="font-size:11px; text-align:left" th:inline="text"><b th:text="${friendSelect}"></b> [[${' ' + message.getTimeString()}]]</p>
+		                				</div>
 		                			</div>
+	                			</div>
+	                			<div th:unless="${iter.index != 0}">
+	                				<p style="font-size:16px; text-align:center" th:text="${message.getDateString()}"></p>
+	                				<div th:if="${message.getSender().equals(user.getId())}">
+	                					<p style="font-size:11px; text-align:right;" th:inline="text"><b th:text="${user.getUsername()}"></b> [[${' ' + message.getTimeString()}]]</p>
+	                				</div>
+	                				<div th:if="${!message.getSender().equals(user.getId())}">
+	                					<p style="font-size:11px; text-align:left" th:inline="text"><b th:text="${friendSelect}"></b> [[${' ' + message.getTimeString()}]]</p>
+	                				</div>
 	                			</div>
 	                		</div>
 			            
@@ -125,6 +145,7 @@
 	 	/*[+
 			var user = [[${user}]];
 			var friendId = [[${friendId}]];
+			var friendSelect = [[${friendSelect}]];
 		+]*/
 		
 		document.getElementById("messageFeed").scrollTop = document.getElementById("messageFeed").scrollHeight;
@@ -132,6 +153,28 @@
 
 		function updateFriend(val) {
 			location.href = '/?friendSelect=' + val;
+		}
+		
+		function removeFriend(val) {
+			form = document.createElement('form');
+			form.method = "POST";
+			form.action = "/";
+			form.enctype = "multipart/form-data";
+			
+			field = document.createElement("input");
+			field.type = "hidden";
+			field.name = "remove";
+			field.value = val;
+			form.appendChild(field);
+			
+			field = document.createElement("input");
+			field.type = "hidden";
+			field.name = "friendSelectHidden";
+			field.value = friendSelect;
+			form.appendChild(field);
+			
+			document.body.appendChild(form);
+			form.submit();
 		}
 		
 		function textAreaEnter(event) {
@@ -157,8 +200,6 @@
 		var sse = new EventSource('http://10.0.0.149:8081/sse');
 		
 		sse.onmessage = function (evt) {
-			console.log(evt);
-			
 			if (!document.hidden) {
 				checkUpdates(evt['data']);
 			}

@@ -53,6 +53,14 @@ public class DatabaseRepo {
         .executeUpdate();
     }
     
+    @Transactional
+    public void removeFriend(Long id, Long friendId) {
+    	entityManager.createNativeQuery("delete from friends where user_id = ?1 AND user_friend = ?2")
+        .setParameter(1, id)
+        .setParameter(2, friendId)
+        .executeUpdate();
+    }
+    
     List<User> getUsers() {
     	return entityManager.createQuery("select user from User user", User.class)
         		.getResultList();
