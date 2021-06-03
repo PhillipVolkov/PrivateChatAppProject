@@ -81,6 +81,12 @@ public class DisplayController {
 						followed = true;
 					}
 					catch (Exception e) {}
+					
+					for (Message message : messages) {
+						if (message.getRead() == null && message.getSender() != user.getId()) {
+							dataBaseRepo.setRead(message.getId());
+						}
+					}
 				}
 			}
 
@@ -120,7 +126,8 @@ public class DisplayController {
 			}
 		}
 		else if (message != null) {
-			dataBaseRepo.insertMessage(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendSelect).getId(), message);
+			if (!message.equals("")) dataBaseRepo.insertMessage(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendSelect).getId(), message);
+			
 			url += "?friendSelect="+friendSelect;
 		}
 		

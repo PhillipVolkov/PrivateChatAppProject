@@ -43,6 +43,13 @@ public class DatabaseRepo {
         .executeUpdate();
     }
     
+    @Transactional
+    public void setRead(Long id) {
+    	entityManager.createNativeQuery("update messages set message_read = true where message_id = ?1")
+        .setParameter(1, id)
+        .executeUpdate();
+    }
+    
     List<User> getUsers() {
     	return entityManager.createQuery("select user from User user", User.class)
         		.getResultList();
