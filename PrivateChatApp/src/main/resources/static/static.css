@@ -1,18 +1,24 @@
 @charset "ISO-8859-1";
 
-body {
+body, html {
+  	overflow:hidden;
+  	
 	background-color:#f0f0f0f0;
 	font-family: sans-serif;
 	margin: 0px;
 	padding: 0px;
+	
+	width:100%;
+	height:100%;
 }
 
 @media screen and (min-width: 720px) {
+	
 	.mainPage {
 		padding:10px;
 		display: grid;
-		grid-template-columns: auto-fit auto-fit;
-		grid-template-rows: auto-fit auto-fit auto-fit;
+		grid-template-columns: min-content auto;
+		grid-template-rows: auto;
 		
 		grid-gap: 10px;
 		padding: 10px;
@@ -20,36 +26,63 @@ body {
 	}
 	
 	.leftElem {
-		grid-row: 2;
+		grid-row: 1;
 		grid-column: 1;
 	}
 	
 	.rightElem {
-		grid-row: 2;
-		grid-column: 2/12;
+		grid-row: 1;
+		grid-column: 2;
+	}
+	
+	.friendFeed {
+		overflow: auto;
+		overflow-x: hidden;
+		max-height: calc(100vh - 240px);
+	}
+	
+	.messageFeed {
+		overflow: auto;
+		overflow-x: hidden;
+		max-height: calc(100vh - 240px);
 	}
 }
 
 @media screen and (max-width: 720px) {
 	.mainPage {
-		padding:10px;
+		padding:5px;
 		display: grid;
-		grid-template-columns: auto-fit auto-fit;
+		grid-template-columns: calc(100vw - 10px);
 		grid-template-rows: auto-fit auto-fit auto-fit;
 		
-		grid-gap: 10px;
-		padding: 10px;
-		margin-right: 10px;
+		max-width: 100px;
 	}
 
 	.leftElem {
-		grid-row: 2;
+		grid-row: 1;
 		grid-column: 1;
 	}
 	
 	.rightElem {
-		grid-row: 3;
+		grid-row: 2;
 		grid-column: 1;
+	}
+	
+	.friendFeed {
+		overflow: auto;
+		overflow-x: hidden;
+		max-height: calc(40vh - 290px);
+	}
+	
+	.messageFeed {
+		overflow: auto;
+		overflow-x: hidden;
+		max-height: calc(60vh - 220px);
+		padding-bottom:1px;
+	}
+	
+	textarea {
+	  font-size: 16px;
 	}
 }
 
@@ -64,6 +97,79 @@ body {
 	margin-right: 10px;
 }
 
+
+.messageGrid {
+	display: grid;
+	grid-template-columns: auto min-content;
+	grid-template-rows: auto-fit;
+	
+	grid-gap: 10px;
+	margin-right: 10px;
+}
+
+.leftSideElem {
+	grid-row: 1;
+	grid-column: 1;
+}
+
+.rightSideElem {
+	grid-row: 1;
+	grid-column: 2;
+}
+
+.messagesL {
+	display: grid;
+	grid-template-columns: auto max-content;
+	grid-template-rows: auto-fit;
+	
+	margin-top:5px;
+}
+
+.messagesR {
+	display: grid;
+	grid-template-columns: max-content auto;
+	grid-template-rows: auto-fit;
+	
+	margin-top:5px;
+}
+
+.yourMessage {
+	grid-row: 1;
+	grid-column: 2;
+	
+	text-align:right;
+	border:1px solid black;
+	border-radius: 5px;
+	padding: 5px;
+	background-color:#bbb;
+	
+  	max-width: 80vw;
+	overflow-wrap: break-word;
+}
+
+.thierMessage {
+	grid-row: 1;
+	grid-column: 1;
+	
+	text-align:left;
+	border:1px solid black;
+	border-radius: 5px;
+	padding: 5px;
+	background-color:#bbb;
+	
+  	max-width: 80vw;
+	overflow-wrap: break-word;
+}
+
+.emptyMessageL {
+	grid-row: 1;
+	grid-column: 1;
+	width:100%;
+}
+.emptyMessageR {
+	grid-row: 1;
+	grid-column: 2;
+}
 
 .topnav {
 	display: flex;

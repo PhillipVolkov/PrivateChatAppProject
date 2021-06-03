@@ -43,6 +43,13 @@ public class DatabaseRepo {
         .executeUpdate();
     }
     
+    @Transactional
+    public void setRead(Long id) {
+    	entityManager.createNativeQuery("update messages set message_read = true where message_id = ?1")
+        .setParameter(1, id)
+        .executeUpdate();
+    }
+    
     List<User> getUsers() {
     	return entityManager.createQuery("select user from User user", User.class)
         		.getResultList();
@@ -61,9 +68,16 @@ public class DatabaseRepo {
     }
     
     List<Message> getMessages(Long userId, Long friendId) {
-    	return entityManager.createQuery("select mes from Message mes where (sender_id=?1 AND recipient_id=?2) OR (recipient_id=?1 AND sender_id=?2)", Message.class)
+    	return entityManager.createQuery("select mes from Message mes where (sender_id=?1 AND recipient_id=?2) OR (recipient_id=?1 AND sender_id=?2) order by mes.id desc", Message.class)
     			.setParameter(1, userId)
     			.setParameter(2, friendId)
+    			.setMaxResults(100)
+        		.getResultList();
+    }
+    
+    List<Message> getCurrentMessages() {
+    	return entityManager.createQuery("select mes from Message mes order by mes.message_id desc", Message.class)
+    			.setMaxResults(20)
         		.getResultList();
     }
     

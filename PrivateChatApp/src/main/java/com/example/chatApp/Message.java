@@ -15,6 +15,7 @@ public class Message {
     private Long sender_id;
     private Long recipient_id;
 	private String message_content;
+	private Boolean message_read;
 	
 	public Message() {}
 	
@@ -32,5 +33,9 @@ public class Message {
 	
 	public String getContents() {
 		return this.message_content;
+	}
+	
+	public Boolean getRead() {
+		return this.message_read;
 	}
 }
