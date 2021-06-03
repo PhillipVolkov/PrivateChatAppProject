@@ -13,7 +13,9 @@ public class User {
     private Long user_id;
 	private String user_name;
 	private String user_password;
-	
+        private String user_email;
+	private String user_pname;
+        
 	public User() {}
 	
 	public Long getId() {
@@ -26,6 +28,14 @@ public class User {
 	
 	public String getPassword() {
 		return this.user_password;
+	}
+        
+        public String getEmail() {
+		return this.user_email;
+	}
+	
+	public String getPname() {
+		return this.user_pname;
 	}
 	
 	public void setUsername(String newName) {

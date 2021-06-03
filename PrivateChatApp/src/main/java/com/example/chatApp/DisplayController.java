@@ -142,14 +142,26 @@ public class DisplayController {
 	@GetMapping("/signup")
     public String signup(Model model) {
         return "signup";
+        
     }
 	
 	@PostMapping("/signup")
-    public RedirectView newUser(@RequestParam(name = "username", required = true) String userName, @RequestParam(name = "password", required = true) String password, HttpSession session, Model model) {
-		dataBaseRepo.insertUser(userName, password);
+    public String newUser(@RequestParam(name = "name", required = true) String name, @RequestParam(name = "email", required = true) String email, @RequestParam(name = "conpass", required = true) String conpass, @RequestParam(name = "username", required = true) String userName, @RequestParam(name = "password", required = true) String password, HttpSession session, Model model) {
+	
+        
+        if (password.contentEquals(conpass)){
+            dataBaseRepo.insertUser(userName, password, name, email);
+            return "main";
+        } 
+        model.addAttribute("message", "Passwords do not match");        
+        return "signup";
+                
+    }   
+  
+        
 		
-        return new RedirectView("/");
-    }
+        
+    
 	
 	@GetMapping("/login")
     public String login(Model model) {
