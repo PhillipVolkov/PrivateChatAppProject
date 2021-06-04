@@ -29,18 +29,21 @@
 						<input type="hidden" name="friendSelectHidden" th:value="${friendSelect}">
 		    		</form>
 		    		
-		    		<div th:if="${friendRequests.size() != 0}">
-			    		<hr class="solid">
-			    		<h3>Friend requests:</h3>
-			    		
-				   		<table>
-				           <tbody>
-				            <tr th:each="friend : ${friendRequests}">
-				                <td th:text="${friend.getUsername()}"></td>
-				            </tr>
-				           </tbody>
-				        </table>
-			    	</div>
+		    		<form method="POST" th:action="@{/}" enctype="multipart/form-data">
+			    		<div th:if="${friendRequests.size() != 0}">
+				    		<hr class="solid">
+				    		<h3>Friend requests:</h3>
+				    		
+				            <div th:each="friend : ${friendRequests}">
+				            	<div class="twoElemGrid">
+				            		<button type="submit" class="leftSideElem" name="friendName" th:value="${friend.getUsername()}" style="background-color:green;font-size:12px;">✓</button>
+				                	<p class="rightSideElem" th:text="${friend.getUsername()}"></p>
+				                </div>
+				            </div>
+				    	</div>
+				    	
+						<input type="hidden" name="friendSelectHidden" th:value="${friendSelect}">
+		    		</form>
 		    	
 			    	<hr class="solid">
 			    	
