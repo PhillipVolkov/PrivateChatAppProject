@@ -1,5 +1,7 @@
 package com.example.chatApp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.socket.WebSocketMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +46,19 @@ public class DisplayController {
 			}
 		});
 		return emitter;
-	}   
+	}
+    
+    @MessageMapping("/chat")
+    @SendTo("/topic/messages")
+    public Typing send(Typing typing) throws Exception {
+        return new Typing(typing.getUser(), typing.getRecipient(), typing.isTyping());
+    }
+    
+    
+    
+    //DISPLAY WHEN USER HAS BEEN LOGGED OUT
+    
+    
     
     //get mapping for the overview page
 	@GetMapping("/")

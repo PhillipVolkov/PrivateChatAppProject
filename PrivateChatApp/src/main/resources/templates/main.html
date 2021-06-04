@@ -50,11 +50,11 @@
 			    	<div class="friendFeed" id="friendFeed">
 						<div th:each="friend : ${friends}">
 							<div class="twoElemGrid">
-								<div th:if="${friend.getUsername().equals(friendSelect)}">
-									<button class="rightSideElem" style="background-color:#bbb;color:black;" id="selectedFriend" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+								<div th:if="${friend.getUsername().equals(friendSelect)}" id="selectedFriend">
+									<button class="rightSideElem" th:id="${'friend' + friend.getId()}" style="background-color:#bbb;color:black;" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
 								</div>
 								<div th:unless="${friend.getUsername().equals(friendSelect)}">
-									<button class="rightSideElem" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+									<button class="rightSideElem" th:id="${'friend' + friend.getId()}" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
 								</div>
 								
 								<button class="leftSideElem" name="remove" th:value="${friend.getId()}" style="background-color:red;" th:attr="onclick=|removeFriend(this.value)|">X</button>
@@ -133,7 +133,7 @@
 			        <hr class="solid">
 			        <form method="POST" th:action="@{/}" enctype="multipart/form-data" id="messageForm" onsubmit="validateMessage(event)">
 			        	<div class="messageGrid">
-							<textarea class="leftSideElem" style="resize:none; padding:5px; white-space:pre-wrap;" id="message" name="message" placeholder="New Message:" rows=3 onkeypress="textAreaEnter(event)"></textarea>
+							<textarea class="leftSideElem" style="resize:none; padding:5px; white-space:pre-wrap;" id="message" name="message" placeholder="New Message:" rows=3 oninput="textAreaChange(event)" onkeypress="textAreaEnter(event)"></textarea>
 							<button class="rightSideElem" type="submit" style="height:100%">Send</button>
 						</div>
 						
@@ -144,6 +144,8 @@
     	</div>
     </body>
     
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script th:inline="javascript">
 	 	/*[+
 			var user = [[${user}]];
@@ -192,6 +194,18 @@
 			}
 		}
 		
+		isTyping = false;
+		function textAreaChange(event) {
+			if (document.getElementById("message").value != "" && !isTyping) {
+				//sendMessage(user["id"], friendId, true);
+				//isTyping = true;
+			}
+			else if (document.getElementById("message").value == "" && isTyping) {
+				//sendMessage(user["id"], friendId, false);
+				//isTyping = false;
+			}
+		}
+		
 		function validateMessage(event) {
 			if (document.getElementById("message").value == "") {
 				event.preventDefault();
@@ -208,6 +222,13 @@
 			}
 			
 			lastMsg = evt['data'];
+			
+			if (document.getElementById("message").value != "" ) {
+				sendMessage(user["id"], friendId, true);
+			}
+			else if (document.getElementById("message").value == "") {
+				sendMessage(user["id"], friendId, false);
+			}
 		};
 		
 		window.onload = function() {
@@ -223,6 +244,11 @@
 			checkUpdates(lastMsg);
 		};
 		
+		window.onbeforeunload = function() {
+			sendMessage(user["id"], friendId, false);
+			isTyping = false;
+		};
+		
 		function checkUpdates(data) {
 			if (prevMsg != data && prevMsg != "") {
 				document.cookie = "messageText=" + document.getElementById("message").value;
@@ -231,5 +257,39 @@
 			
 			prevMsg = data;
 		}
+
+		var stompClient = null;
+
+	    connect();
+	    
+		function connect() {
+			var socket = new SockJS('/chat');
+			stompClient = Stomp.over(socket);  
+			stompClient.connect({}, function(frame) {
+				stompClient.subscribe('/topic/messages', function(messageOutput) {
+					showMessageOutput(JSON.parse(messageOutput.body));
+				});
+				
+				console.log(document.getElementById("message").value);
+				if (document.getElementById("message").value != "") {
+					sendMessage(user["id"], friendId, true);
+					isTyping = true;
+				}
+			});
+		}
+	    
+	    function sendMessage(user, recipient, typing) {
+	        stompClient.send("/app/chat", {}, JSON.stringify({'user':user, 'recipient':recipient, 'typing':typing}));
+	    }
+	    
+	    function showMessageOutput(messageOutput) {
+	    	if (messageOutput.recipient == user['id'] && messageOutput.typing == true) {
+	        	document.getElementById("friend"+messageOutput.user).style.fontStyle = "italic";
+	    	}
+	    	
+	    	else if (messageOutput.recipient == user['id'] && messageOutput.typing == false) {
+	        	document.getElementById("friend"+messageOutput.user).style.fontStyle = "normal";
+	    	}
+	    }
 	</script>
 </html>
