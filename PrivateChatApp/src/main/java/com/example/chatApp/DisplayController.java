@@ -10,6 +10,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -82,6 +83,19 @@ public class DisplayController {
 					
 					messages = new ArrayList<Message>();
 					for (int i = tempMessages.size()-1; i >= 0; i--) {
+						if (tempMessages.get(i).getContents().contains("\n")) {
+							Scanner scan = new Scanner(tempMessages.get(i).getContents()).useDelimiter("\n");
+							String message = "";
+							
+							while (scan.hasNext()) {
+								message += scan.next();
+								
+								if (scan.hasNext()) message += " <br> ";
+							}
+							
+							tempMessages.get(i).setContents(message);
+						}
+						
 						messages.add(tempMessages.get(i));
 					}
 					

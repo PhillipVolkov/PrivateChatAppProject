@@ -40,6 +40,10 @@ public class Message {
 		return this.message_read;
 	}
 	
+	public void setContents(String contents) {
+		this.message_content = contents;
+	}
+	
 	public java.sql.Timestamp getTimeStamp() {
 		return this.message_time;
 	}

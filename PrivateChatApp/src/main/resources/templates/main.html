@@ -103,7 +103,7 @@
 			            
 			                <div th:if="${message.getSender().equals(user.getId())}" class="messagesL">
 			                	<span class="emptyMessageL"></span>
-			                	<span class="yourMessage" th:text="${message.getContents()}"></span>
+			                	<span class="yourMessage" th:utext="${message.getContents()}"></span>
 			                </div>
 			                
 			                <div th:if="${message.getSender().equals(user.getId()) && iter.index == iter.size-1}">
@@ -121,7 +121,7 @@
 			                </div>
 			                
 			                <div th:unless="${message.getSender().equals(user.getId())}" class="messagesR">
-			                	<span class="thierMessage" th:text="${message.getContents()}"></span>
+			                	<span class="thierMessage" th:utext="${message.getContents()}"></span>
 			                	<span class="emptyMessageR"></span>
 			                </div>
 			            </div>
@@ -130,7 +130,7 @@
 			        <hr class="solid">
 			        <form method="POST" th:action="@{/}" enctype="multipart/form-data" id="messageForm" onsubmit="validateMessage(event)">
 			        	<div class="messageGrid">
-							<textarea class="leftSideElem" style="resize:none; padding:5px;" id="message" name="message" placeholder="New Message:" rows=3 onkeypress="textAreaEnter(event)"></textarea>
+							<textarea class="leftSideElem" style="resize:none; padding:5px; white-space:pre-wrap;" id="message" name="message" placeholder="New Message:" rows=3 onkeypress="textAreaEnter(event)"></textarea>
 							<button class="rightSideElem" type="submit" style="height:100%">Send</button>
 						</div>
 						
