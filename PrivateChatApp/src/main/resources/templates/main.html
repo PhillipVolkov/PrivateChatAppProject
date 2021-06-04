@@ -48,13 +48,21 @@
 			    	<hr class="solid">
 			    	
 			    	<div class="friendFeed" id="friendFeed">
-						<div th:each="friend : ${friends}">
+						<div th:each="friend, iter : ${friends}">
 							<div class="twoElemGrid">
 								<div th:if="${friend.getUsername().equals(friendSelect)}" id="selectedFriend">
-									<button class="rightSideElem" th:id="${'friend' + friend.getId()}" style="background-color:#bbb;color:black;" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+									<button th:if="${unreadMessages.get(iter.index) != 0}" class="rightSideElem" th:id="${'friend' + friend.getId()}" style="background-color:#bbb;color:black;" 
+									th:value="${friend.getUsername()}" th:text="${unreadMessages.get(iter.index) + ' ' +  friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+									
+									<button th:if="${unreadMessages.get(iter.index) == 0}" class="rightSideElem" th:id="${'friend' + friend.getId()}" style="background-color:#bbb;color:black;" 
+									th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
 								</div>
 								<div th:unless="${friend.getUsername().equals(friendSelect)}">
-									<button class="rightSideElem" th:id="${'friend' + friend.getId()}" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+									<button th:if="${unreadMessages.get(iter.index) != 0}" class="rightSideElem" th:id="${'friend' + friend.getId()}" th:value="${friend.getUsername()}" 
+									th:text="${unreadMessages.get(iter.index) + ' ' + friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+									
+									<button th:if="${unreadMessages.get(iter.index) == 0}" class="rightSideElem" th:id="${'friend' + friend.getId()}" th:value="${friend.getUsername()}" 
+									th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
 								</div>
 								
 								<button class="leftSideElem" name="remove" th:value="${friend.getId()}" style="background-color:red;" th:attr="onclick=|removeFriend(this.value)|">X</button>
@@ -250,6 +258,8 @@
 		};
 		
 		function checkUpdates(data) {
+			console.log(data);
+			
 			if (prevMsg != data && prevMsg != "") {
 				document.cookie = "messageText=" + document.getElementById("message").value;
 				location.reload();
@@ -265,6 +275,7 @@
 		function connect() {
 			var socket = new SockJS('/chat');
 			stompClient = Stomp.over(socket);  
+			stompClient.debug = null;
 			stompClient.connect({}, function(frame) {
 				stompClient.subscribe('/topic/messages', function(messageOutput) {
 					showMessageOutput(JSON.parse(messageOutput.body));

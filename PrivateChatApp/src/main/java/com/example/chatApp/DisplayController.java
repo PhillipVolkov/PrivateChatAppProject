@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.view.RedirectView;
-import org.springframework.web.socket.WebSocketMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +34,19 @@ public class DisplayController {
 		
 		nonBlockingService.execute(() -> {
 			try {
-				emitter.send(dataBaseRepo.getMessages(Long.parseLong(session.getAttribute("userId").toString()), Long.parseLong(session.getAttribute("selectedFriend").toString())));
+				String send = "empty";
+				
+				List<Message> messages = dataBaseRepo.getUnreadMessage(Long.parseLong(session.getAttribute("userId").toString()), Long.parseLong(session.getAttribute("selectedFriend").toString()));
+				for (Message message : messages) {
+					send += message.toString();
+				}
+				
+				List<Friend> unreadFriends = dataBaseRepo.getUnread(Long.parseLong(session.getAttribute("userId").toString()));
+				for (Friend friend : unreadFriends) {
+					send += friend.toString();
+				}
+				
+				emitter.send(send);
 				emitter.complete();
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
@@ -55,10 +66,10 @@ public class DisplayController {
     }
     
     
-    
     //DISPLAY WHEN USER HAS BEEN LOGGED OUT
+    //DISPLAY WHEN ONLINE
     
-    
+    //FIX UNREAD RESET
     
     //get mapping for the overview page
 	@GetMapping("/")
@@ -66,6 +77,7 @@ public class DisplayController {
 		User user = null;
 		List<Message> messages = null;
 		List<User> friends = null;
+		List<Integer> unreadMessages = null;
 		boolean followed = false;
 		List<User> friendRequests = null;
 		Long friendId = null;
@@ -74,8 +86,10 @@ public class DisplayController {
 			user = dataBaseRepo.getUser(session.getAttribute("username").toString());
 			
 			friends = new ArrayList<User>();
+			unreadMessages = new ArrayList<Integer>();
 			for (Friend friend : dataBaseRepo.getFriends(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId())) {
 				friends.add(dataBaseRepo.getUserById(friend.getFriend()));
+				unreadMessages.add(friend.getUnread());
 			}
 			
 			if (friendSelect == null && friends.size() != 0) {
@@ -137,9 +151,12 @@ public class DisplayController {
 			}
 		}
 		
+		dataBaseRepo.removeUnread(Long.parseLong(session.getAttribute("userId").toString()), friendId);
+		
         model.addAttribute("user", user);
         model.addAttribute("friends", friends);
         model.addAttribute("friendId", friendId);
+        model.addAttribute("unreadMessages", unreadMessages);
         model.addAttribute("friendSelect", friendSelect);
         model.addAttribute("followed", followed);
         model.addAttribute("friendRequests", friendRequests);
@@ -165,7 +182,10 @@ public class DisplayController {
 			}
 		}
 		else if (message != null) {
-			if (!message.equals("")) dataBaseRepo.insertMessage(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendSelect).getId(), message, new java.sql.Timestamp(System.currentTimeMillis()));
+			if (!message.equals("")) {
+				dataBaseRepo.insertMessage(dataBaseRepo.getUser(session.getAttribute("username").toString()).getId(), dataBaseRepo.getUser(friendSelect).getId(), message, new java.sql.Timestamp(System.currentTimeMillis()));
+				dataBaseRepo.increaseUnread(1, dataBaseRepo.getUser(friendSelect).getId(), dataBaseRepo.getUser(session.getAttribute("username").toString()).getId());
+			}
 			
 			url += "?friendSelect="+friendSelect;
 		}

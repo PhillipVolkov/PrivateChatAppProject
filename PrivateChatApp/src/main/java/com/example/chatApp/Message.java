@@ -74,4 +74,8 @@ public class Message {
 				
 		return date;
 	}
+	
+	public String toString() {
+		return message_id + " " + " " + sender_id + " " + recipient_id + " " + message_read + "\t" + message_content;
+	}
 }

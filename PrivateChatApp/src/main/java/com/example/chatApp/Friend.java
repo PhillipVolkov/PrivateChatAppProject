@@ -13,6 +13,7 @@ public class Friend {
     private Long friend_id;
     private Long user_id;
 	private Long user_friend;
+	private int friend_unread;
 	
 	public Friend() {}
 	
@@ -22,5 +23,13 @@ public class Friend {
 	
 	public Long getFriend() {
 		return this.user_friend;
+	}
+	
+	public int getUnread() {
+		return this.friend_unread;
+	}
+	
+	public String toString() {
+		return user_id + " " + user_friend + " " + friend_unread;
 	}
 }
