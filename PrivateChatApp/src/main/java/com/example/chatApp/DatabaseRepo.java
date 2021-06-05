@@ -30,7 +30,7 @@ public class DatabaseRepo {
     
     @Transactional
     public void insertFriend(Long user, Long friend) {
-    	entityManager.createNativeQuery("insert into friends (user_id, user_friend) values (?,?)")
+    	entityManager.createNativeQuery("insert into friends (user_id, user_friend, friend_unread) values (?,? ,0)")
         .setParameter(1, user)
         .setParameter(2, friend)
         .executeUpdate();

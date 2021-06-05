@@ -34,7 +34,7 @@ public class DisplayController {
 		
 		nonBlockingService.execute(() -> {
 			try {
-				String send = "empty";
+				String send = session.getAttribute("username").toString();
 				
 				List<Message> messages = dataBaseRepo.getUnreadMessage(Long.parseLong(session.getAttribute("userId").toString()), Long.parseLong(session.getAttribute("selectedFriend").toString()));
 				for (Message message : messages) {
@@ -65,11 +65,8 @@ public class DisplayController {
         return new Typing(typing.getUser(), typing.getRecipient(), typing.isTyping());
     }
     
-    
-    //DISPLAY WHEN USER HAS BEEN LOGGED OUT
     //DISPLAY WHEN ONLINE
-    
-    //FIX UNREAD RESET
+    //IMPROVE REFRESH
     
     //get mapping for the overview page
 	@GetMapping("/")
@@ -149,9 +146,9 @@ public class DisplayController {
 				}
 				catch (Exception e) {}
 			}
+			
+			if (friendId != null) dataBaseRepo.removeUnread(Long.parseLong(session.getAttribute("userId").toString()), friendId);
 		}
-		
-		dataBaseRepo.removeUnread(Long.parseLong(session.getAttribute("userId").toString()), friendId);
 		
         model.addAttribute("user", user);
         model.addAttribute("friends", friends);
