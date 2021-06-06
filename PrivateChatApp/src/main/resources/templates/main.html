@@ -26,30 +26,46 @@
 		    		
 		    		<form method="POST" th:action="@{/}" enctype="multipart/form-data">
 						<label>Add a Friend: </label><input type="text" id="friendName" name="friendName" placeholder="FriendUsername">
+						<input type="hidden" name="friendSelectHidden" th:value="${friendSelect}">
 		    		</form>
 		    		
-		    		<div th:if="${friendRequests.size() != 0}">
-			    		<hr class="solid">
-			    		<h3>Friend requests:</h3>
-			    		
-				   		<table>
-				           <tbody>
-				            <tr th:each="friend : ${friendRequests}">
-				                <td th:text="${friend.getUsername()}"></td>
-				            </tr>
-				           </tbody>
-				        </table>
-			    	</div>
+		    		<form method="POST" th:action="@{/}" enctype="multipart/form-data">
+			    		<div th:if="${friendRequests.size() != 0}">
+				    		<hr class="solid">
+				    		<h3>Friend requests:</h3>
+				    		
+				            <div th:each="friend : ${friendRequests}">
+				            	<div class="twoElemGrid">
+				            		<button type="submit" class="leftSideElem" name="friendName" th:value="${friend.getUsername()}" style="background-color:green;font-size:12px;">✓</button>
+				                	<p class="rightSideElem" th:text="${friend.getUsername()}"></p>
+				                </div>
+				            </div>
+				    	</div>
+				    	
+						<input type="hidden" name="friendSelectHidden" th:value="${friendSelect}">
+		    		</form>
 		    	
 			    	<hr class="solid">
 			    	
 			    	<div class="friendFeed" id="friendFeed">
-						<div th:each="friend : ${friends}">
-							<div th:if="${friend.getUsername().equals(friendSelect)}">
-								<button class="selected" id="selectedFriend" th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
-							</div>
-							<div th:unless="${friend.getUsername().equals(friendSelect)}">
-								<button th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+						<div th:each="friend, iter : ${friends}">
+							<div class="twoElemGrid">
+								<div th:if="${friend.getUsername().equals(friendSelect)}" id="selectedFriend">
+									<button th:if="${unreadMessages.get(iter.index) != 0}" class="rightSideElem" th:id="${'friend' + friend.getId()}" style="background-color:#bbb;color:black;" 
+									th:value="${friend.getUsername()}" th:text="${unreadMessages.get(iter.index) + ' ' +  friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+									
+									<button th:if="${unreadMessages.get(iter.index) == 0}" class="rightSideElem" th:id="${'friend' + friend.getId()}" style="background-color:#bbb;color:black;" 
+									th:value="${friend.getUsername()}" th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+								</div>
+								<div th:unless="${friend.getUsername().equals(friendSelect)}">
+									<button th:if="${unreadMessages.get(iter.index) != 0}" class="rightSideElem" th:id="${'friend' + friend.getId()}" th:value="${friend.getUsername()}" 
+									th:text="${unreadMessages.get(iter.index) + ' ' + friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+									
+									<button th:if="${unreadMessages.get(iter.index) == 0}" class="rightSideElem" th:id="${'friend' + friend.getId()}" th:value="${friend.getUsername()}" 
+									th:text="${friend.getUsername()}" th:attr="onclick=|updateFriend(this.value)|"></button>
+								</div>
+								
+								<button class="leftSideElem" name="remove" th:value="${friend.getId()}" style="background-color:red;" th:attr="onclick=|removeFriend(this.value)|">X</button>
 							</div>
 		   				</div>
 	   				</div>
@@ -65,9 +81,40 @@
 		    		
 		    		<div class="messageFeed" id="messageFeed">
 			            <div th:each="message,iter : ${messages}">
+			            	<div th:if="${message.getTimeStamp() != null}">
+			            		<div th:if="${iter.index != 0}">
+			            			<div th:if="${messages.get(iter.index-1).getTimeStamp() != null}">
+		                				<p th:if="${!messages.get(iter.index-1).getDateString().equals(message.getDateString())}" style="font-size:16px; text-align:center" th:text="${message.getDateString()}"></p>
+		                			</div>
+		                			<div th:if="${messages.get(iter.index-1).getTimeStamp() == null}">
+		                				<p style="font-size:16px; text-align:center" th:text="${message.getDateString()}"></p>
+		                			</div>
+			            		
+				            		<div th:if="${messages.get(iter.index-1).getTimeStamp() != null}">
+		                				<div th:if="${(!messages.get(iter.index-1).getTimeString().equals(message.getTimeString()) && message.getSender().equals(user.getId())) || 
+		                				(!messages.get(iter.index-1).getSender().equals(user.getId()) && message.getSender().equals(user.getId()))}">
+		                					<p style="font-size:11px; text-align:right" th:inline="text"><b th:text="${user.getUsername()}"></b> [[${' ' + message.getTimeString()}]]</p>
+		                				</div>
+		                				<div th:if="${(!messages.get(iter.index-1).getTimeString().equals(message.getTimeString()) && !message.getSender().equals(user.getId())) ||
+		                				(messages.get(iter.index-1).getSender().equals(user.getId()) && !message.getSender().equals(user.getId()))}">
+		                					<p style="font-size:11px; text-align:left" th:inline="text"><b th:text="${friendSelect}"></b> [[${' ' + message.getTimeString()}]]</p>
+		                				</div>
+		                			</div>
+	                			</div>
+	                			<div th:unless="${iter.index != 0}">
+	                				<p style="font-size:16px; text-align:center" th:text="${message.getDateString()}"></p>
+	                				<div th:if="${message.getSender().equals(user.getId())}">
+	                					<p style="font-size:11px; text-align:right;" th:inline="text"><b th:text="${user.getUsername()}"></b> [[${' ' + message.getTimeString()}]]</p>
+	                				</div>
+	                				<div th:if="${!message.getSender().equals(user.getId())}">
+	                					<p style="font-size:11px; text-align:left" th:inline="text"><b th:text="${friendSelect}"></b> [[${' ' + message.getTimeString()}]]</p>
+	                				</div>
+	                			</div>
+	                		</div>
+			            
 			                <div th:if="${message.getSender().equals(user.getId())}" class="messagesL">
 			                	<span class="emptyMessageL"></span>
-			                	<span class="yourMessage" th:text="${message.getContents()}"></span>
+			                	<span class="yourMessage" th:utext="${message.getContents()}"></span>
 			                </div>
 			                
 			                <div th:if="${message.getSender().equals(user.getId()) && iter.index == iter.size-1}">
@@ -85,7 +132,7 @@
 			                </div>
 			                
 			                <div th:unless="${message.getSender().equals(user.getId())}" class="messagesR">
-			                	<span class="thierMessage" th:text="${message.getContents()}"></span>
+			                	<span class="thierMessage" th:utext="${message.getContents()}"></span>
 			                	<span class="emptyMessageR"></span>
 			                </div>
 			            </div>
@@ -94,7 +141,7 @@
 			        <hr class="solid">
 			        <form method="POST" th:action="@{/}" enctype="multipart/form-data" id="messageForm" onsubmit="validateMessage(event)">
 			        	<div class="messageGrid">
-							<textarea class="leftSideElem" style="resize:none; padding:5px;" id="message" name="message" placeholder="New Message:" rows=3 onkeypress="textAreaEnter(event)"></textarea>
+							<textarea class="leftSideElem" style="resize:none; padding:5px; white-space:pre-wrap;" id="message" name="message" placeholder="New Message:" rows=3 oninput="textAreaChange(event)" onkeypress="textAreaEnter(event)"></textarea>
 							<button class="rightSideElem" type="submit" style="height:100%">Send</button>
 						</div>
 						
@@ -105,10 +152,13 @@
     	</div>
     </body>
     
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script th:inline="javascript">
 	 	/*[+
 			var user = [[${user}]];
 			var friendId = [[${friendId}]];
+			var friendSelect = [[${friendSelect}]];
 		+]*/
 		
 		document.getElementById("messageFeed").scrollTop = document.getElementById("messageFeed").scrollHeight;
@@ -116,6 +166,28 @@
 
 		function updateFriend(val) {
 			location.href = '/?friendSelect=' + val;
+		}
+		
+		function removeFriend(val) {
+			form = document.createElement('form');
+			form.method = "POST";
+			form.action = "/";
+			form.enctype = "multipart/form-data";
+			
+			field = document.createElement("input");
+			field.type = "hidden";
+			field.name = "remove";
+			field.value = val;
+			form.appendChild(field);
+			
+			field = document.createElement("input");
+			field.type = "hidden";
+			field.name = "friendSelectHidden";
+			field.value = friendSelect;
+			form.appendChild(field);
+			
+			document.body.appendChild(form);
+			form.submit();
 		}
 		
 		function textAreaEnter(event) {
@@ -127,6 +199,18 @@
 				if (document.getElementById("message").value != "") {
 					document.getElementById("messageForm").submit();
 				}
+			}
+		}
+		
+		isTyping = false;
+		function textAreaChange(event) {
+			if (document.getElementById("message").value != "" && !isTyping) {
+				//sendMessage(user["id"], friendId, true);
+				//isTyping = true;
+			}
+			else if (document.getElementById("message").value == "" && isTyping) {
+				//sendMessage(user["id"], friendId, false);
+				//isTyping = false;
 			}
 		}
 		
@@ -146,6 +230,13 @@
 			}
 			
 			lastMsg = evt['data'];
+			
+			if (document.getElementById("message").value != "" ) {
+				sendMessage(user["id"], friendId, true);
+			}
+			else if (document.getElementById("message").value == "") {
+				sendMessage(user["id"], friendId, false);
+			}
 		};
 		
 		window.onload = function() {
@@ -161,7 +252,14 @@
 			checkUpdates(lastMsg);
 		};
 		
+		window.onbeforeunload = function() {
+			sendMessage(user["id"], friendId, false);
+			isTyping = false;
+		};
+		
 		function checkUpdates(data) {
+			console.log(data);
+			
 			if (prevMsg != data && prevMsg != "") {
 				document.cookie = "messageText=" + document.getElementById("message").value;
 				location.reload();
@@ -169,5 +267,40 @@
 			
 			prevMsg = data;
 		}
+
+		var stompClient = null;
+
+	    connect();
+	    
+		function connect() {
+			var socket = new SockJS('/chat');
+			stompClient = Stomp.over(socket);  
+			stompClient.debug = null;
+			stompClient.connect({}, function(frame) {
+				stompClient.subscribe('/topic/messages', function(messageOutput) {
+					showMessageOutput(JSON.parse(messageOutput.body));
+				});
+				
+				console.log(document.getElementById("message").value);
+				if (document.getElementById("message").value != "") {
+					sendMessage(user["id"], friendId, true);
+					isTyping = true;
+				}
+			});
+		}
+	    
+	    function sendMessage(user, recipient, typing) {
+	        stompClient.send("/app/chat", {}, JSON.stringify({'user':user, 'recipient':recipient, 'typing':typing}));
+	    }
+	    
+	    function showMessageOutput(messageOutput) {
+	    	if (messageOutput.recipient == user['id'] && messageOutput.typing == true) {
+	        	document.getElementById("friend"+messageOutput.user).style.fontStyle = "italic";
+	    	}
+	    	
+	    	else if (messageOutput.recipient == user['id'] && messageOutput.typing == false) {
+	        	document.getElementById("friend"+messageOutput.user).style.fontStyle = "normal";
+	    	}
+	    }
 	</script>
 </html>
