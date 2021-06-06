@@ -29,6 +29,16 @@ public class DatabaseRepo {
     }
     
     @Transactional
+    public void editUser(String Username, String name, String email, String password) {
+    	entityManager.createNativeQuery("update users set user_pname = ?, user_email = ?, user_password = ? where user_name = ?")
+        .setParameter(1, name)
+        .setParameter(2, email)
+        .setParameter(3, password)
+        .setParameter(4, Username)        
+        .executeUpdate();
+    }
+    
+    @Transactional
     public void insertFriend(Long user, Long friend) {
     	entityManager.createNativeQuery("insert into friends (user_id, user_friend, friend_unread) values (?,? ,0)")
         .setParameter(1, user)
