@@ -157,6 +157,48 @@ public class DisplayController {
         return "signup";
                 
     }   
+    
+    	@GetMapping("/profile")
+    public String profile(HttpSession session, Model model) {
+        model.addAttribute("message", "Before Loading Profile"); 
+        // Get Name & Email from database
+        // Populate the text fields with the values from DB
+        
+        User user = null;
+		
+		try {
+			if (session.getAttribute("username") != null) {
+                            user = dataBaseRepo.getUser(session.getAttribute("username").toString());
+                            model.addAttribute("user",user);
+                        }
+		}
+		catch (Exception e) {}
+		
+		if (user != null) {
+               
+                    model.addAttribute("message","Current Username: " + user.getUsername()+ "--------" + "Old Name: " + user.getPname() + "--------" + "Old Email: " + user.getEmail());
+                                            
+                }
+		
+		
+        
+        return "profile";
+        
+    }
+    
+    @PostMapping("/profile")
+    public String editProfile(@RequestParam(name = "username", required = true) String username, @RequestParam(name = "npname", required = true) String npname, @RequestParam(name = "nemail", required = true) String nemail, @RequestParam(name = "npassword", required = true) String npassword, HttpSession session, Model model) {
+	// Take the new Name, email
+        // Save to DB
+        // GO back to main page?
+        
+        //db.updateUser -- new function
+        
+        dataBaseRepo.editUser(username, npname, nemail, npassword );
+        //model.addAttribute("message", npname+" "+nemail+" "+ username); 
+        return "login";
+                
+    }   
   
         
 		
