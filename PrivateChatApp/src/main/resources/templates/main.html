@@ -11,7 +11,7 @@
     
     <body>
     	<div class="topnav">
-    		<a class="topnavElem" th:unless="${user == null}" th:text="${ user.getUsername()}"></a>
+    		<a class="topnavElem" th:unless="${user == null}" th:text="${ user.getUsername()}" href="/"></a>
     		<a class="topnavElem" th:if="${user == null}" href="/login">Login</a>
     		<a class="topnavElem" th:if="${user == null}" href="/signup">Sign Up</a>
     		<a class="topnavElem" th:unless="${user == null}" href="/logout">Logout</a>

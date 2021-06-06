@@ -13,7 +13,7 @@
     
     <body>
         <div class="topnav">
-    		<a class="topnavElem" th:unless="${user == null}" th:text="${ user.getUsername()}"></a>
+    		<a class="topnavElem" th:unless="${user == null}" th:text="${ user.getUsername()}" href="/"></a>
     		<a class="topnavElem" th:if="${user == null}" href="/login">Login</a>
     		<a class="topnavElem" th:if="${user == null}" href="/signup">Sign Up</a>
     		<a class="topnavElem" th:unless="${user == null}" href="/logout">Logout</a>
@@ -28,9 +28,7 @@
                             <label>New Email:</label> <input type="email" th:value = "${user.getEmail()}"id="nemail" name="nemail"> <br>
                             <label>New Password:</label> <input type="password" th:value = "${user.getPassword()}"id="npassword" name="npassword"> <br>
                             <button type="submit" class="btn btn-primary">Save!</button>
-                            <p th:text="${message}"></p>
-                           
-			</div>
+				</div>
 	        </form>
         </div>
     </body>
